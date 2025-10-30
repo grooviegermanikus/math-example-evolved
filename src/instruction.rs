@@ -18,6 +18,17 @@ pub enum MathInstruction {
         /// calculated
         radicand: u64,
     },
+    /// Muldiv three u64 values
+    ///
+    /// No accounts required for this instruction
+    // PreciseMulDiv {
+    //     /// The value to be multiplied and divided
+    //     val: u64,
+    //     /// The numerator
+    //     num: u64,
+    //     /// The denominator
+    //     denom: u64,
+    // },
     /// Calculate the integer square root of the given u64
     ///
     /// No accounts required for this instruction

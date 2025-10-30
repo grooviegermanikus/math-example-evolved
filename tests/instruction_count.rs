@@ -23,7 +23,7 @@ async fn test_precise_sqrt_u64_max() {
     transaction.sign(&[&payer], recent_blockhash);
 
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
-    assert_eq!(result.metadata.unwrap().compute_units_consumed, 365538);
+    assert_eq!(result.metadata.unwrap().compute_units_consumed, 358721);
 }
 
 #[tokio::test]
@@ -40,7 +40,7 @@ async fn test_precise_sqrt_u32_max() {
     );
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
-    assert_eq!(result.metadata.unwrap().compute_units_consumed, 187169);
+    assert_eq!(result.metadata.unwrap().compute_units_consumed, 181140);
 }
 
 #[tokio::test]
