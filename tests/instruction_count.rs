@@ -23,7 +23,7 @@ async fn test_precise_sqrt_u64_max() {
     transaction.sign(&[&payer], recent_blockhash);
 
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
-    assert_eq!(result.metadata.unwrap().compute_units_consumed, 358721);
+    assert_eq!(result.metadata.unwrap().compute_units_consumed, 358720);
 }
 
 #[tokio::test]
@@ -40,7 +40,7 @@ async fn test_precise_sqrt_u32_max() {
     );
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
-    assert_eq!(result.metadata.unwrap().compute_units_consumed, 181140);
+    assert_eq!(result.metadata.unwrap().compute_units_consumed, 181139);
 }
 
 #[tokio::test]
@@ -55,7 +55,7 @@ async fn test_sqrt_u64() {
         Transaction::new_with_payer(&[instruction::sqrt_u64(u64::MAX)], Some(&payer.pubkey()));
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
-    assert_eq!(result.metadata.unwrap().compute_units_consumed, 1829);
+    assert_eq!(result.metadata.unwrap().compute_units_consumed, 1825);
 }
 
 #[tokio::test]
@@ -72,7 +72,7 @@ async fn test_sqrt_u128() {
     );
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
-    assert_eq!(result.metadata.unwrap().compute_units_consumed, 3890);
+    assert_eq!(result.metadata.unwrap().compute_units_consumed, 3892);
 }
 
 #[tokio::test]
@@ -87,7 +87,7 @@ async fn test_sqrt_u128_max() {
         Transaction::new_with_payer(&[instruction::sqrt_u128(u128::MAX)], Some(&payer.pubkey()));
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
-    assert_eq!(result.metadata.unwrap().compute_units_consumed, 6743);
+    assert_eq!(result.metadata.unwrap().compute_units_consumed, 6745);
 }
 
 #[tokio::test]
@@ -117,7 +117,7 @@ async fn test_u64_multiply() {
         Transaction::new_with_payer(&[instruction::u64_multiply(42, 84)], Some(&payer.pubkey()));
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
-    assert_eq!(result.metadata.unwrap().compute_units_consumed, 980);
+    assert_eq!(result.metadata.unwrap().compute_units_consumed, 976);
 }
 
 #[tokio::test]
@@ -149,7 +149,7 @@ async fn test_f32_multiply() {
     );
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
-    assert_eq!(result.metadata.unwrap().compute_units_consumed, 1156);
+    assert_eq!(result.metadata.unwrap().compute_units_consumed, 1152);
 }
 
 #[tokio::test]
@@ -166,7 +166,7 @@ async fn test_f32_divide() {
     );
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
-    assert_eq!(result.metadata.unwrap().compute_units_consumed, 1206);
+    assert_eq!(result.metadata.unwrap().compute_units_consumed, 1207);
 }
 
 #[tokio::test]
@@ -183,7 +183,7 @@ async fn test_f32_exponentiate() {
     );
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
-    assert_eq!(result.metadata.unwrap().compute_units_consumed, 1199);
+    assert_eq!(result.metadata.unwrap().compute_units_consumed, 1194);
 }
 
 #[tokio::test]
@@ -215,7 +215,7 @@ async fn test_f32_normal_cdf() {
         Transaction::new_with_payer(&[instruction::f32_normal_cdf(0_f32)], Some(&payer.pubkey()));
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
-    assert_eq!(result.metadata.unwrap().compute_units_consumed, 2523);
+    assert_eq!(result.metadata.unwrap().compute_units_consumed, 2521);
 }
 
 #[tokio::test]
@@ -232,7 +232,7 @@ async fn test_f64_pow() {
     );
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
-    assert_eq!(result.metadata.unwrap().compute_units_consumed, 12909);
+    assert_eq!(result.metadata.unwrap().compute_units_consumed, 12913);
 }
 
 #[tokio::test]
@@ -282,7 +282,7 @@ async fn test_f64_multiply() {
     );
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
-    assert_eq!(result.metadata.unwrap().compute_units_consumed, 1267);
+    assert_eq!(result.metadata.unwrap().compute_units_consumed, 1265);
 }
 
 #[tokio::test]
@@ -299,7 +299,7 @@ async fn test_f64_divide() {
     );
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
-    assert_eq!(result.metadata.unwrap().compute_units_consumed, 1332);
+    assert_eq!(result.metadata.unwrap().compute_units_consumed, 1336);
 }
 
 #[tokio::test]
@@ -314,5 +314,5 @@ async fn test_noop() {
         Transaction::new_with_payer(&[instruction::noop()], Some(&payer.pubkey()));
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
-    assert_eq!(result.metadata.unwrap().compute_units_consumed, 361);
+    assert_eq!(result.metadata.unwrap().compute_units_consumed, 363);
 }
