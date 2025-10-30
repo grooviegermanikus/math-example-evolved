@@ -9,6 +9,7 @@ edition = "2021"
 
 [features]
 no-entrypoint = []
+custom-heap = []
 test-sbf = []
 
 [dependencies]

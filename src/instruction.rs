@@ -21,14 +21,14 @@ pub enum MathInstruction {
     /// Muldiv three u64 values
     ///
     /// No accounts required for this instruction
-    // PreciseMulDiv {
-    //     /// The value to be multiplied and divided
-    //     val: u64,
-    //     /// The numerator
-    //     num: u64,
-    //     /// The denominator
-    //     denom: u64,
-    // },
+    PreciseMulDiv {
+        /// The value to be multiplied and divided
+        val: u64,
+        /// The numerator
+        num: u64,
+        /// The denominator
+        denom: u64,
+    },
     /// Calculate the integer square root of the given u64
     ///
     /// No accounts required for this instruction
@@ -167,6 +167,15 @@ pub fn precise_sqrt(radicand: u64) -> Instruction {
         program_id: id(),
         accounts: vec![],
         data: borsh::to_vec(&MathInstruction::PreciseSquareRoot { radicand }).unwrap(),
+    }
+}
+
+/// Create PreciseMulDiv instruction
+pub fn precise_muldiv(val: u64, num: u64, denom: u64) -> Instruction {
+    Instruction {
+        program_id: id(),
+        accounts: vec![],
+        data: borsh::to_vec(&MathInstruction::PreciseMulDiv { val, num, denom }).unwrap(),
     }
 }
 

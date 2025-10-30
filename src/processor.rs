@@ -91,17 +91,17 @@ pub fn process_instruction(
             msg!("{}", result);
             Ok(())
         }
-        // MathInstruction::PreciseMulDiv { val, num, denom } => {
-        //     msg!("Calculating muldiv using PreciseNumber");
-        //     let val = PreciseNumber::new(val as u128).unwrap();
-        //     let num = PreciseNumber::new(num as u128).unwrap();
-        //     let denom = PreciseNumber::new(denom as u128).unwrap();
-        //     sol_log_compute_units();
-        //     // let result = val.mul_div_floor(num, denom).unwrap().to_imprecise().unwrap();
-        //     // sol_log_compute_units();
-        //     // msg!("{}", result);
-        //     Ok(())
-        // }
+        MathInstruction::PreciseMulDiv { val, num, denom } => {
+            msg!("Calculating muldiv using PreciseNumber");
+            let val = PreciseNumber::new(val as u128).unwrap();
+            let num = PreciseNumber::new(num as u128).unwrap();
+            let denom = PreciseNumber::new(denom as u128).unwrap();
+            sol_log_compute_units();
+            let result = val.mul_div_floor(num, denom).unwrap().to_imprecise().unwrap();
+            sol_log_compute_units();
+            msg!("{}", result);
+            Ok(())
+        }
         MathInstruction::SquareRootU64 { radicand } => {
             msg!("Calculating u64 square root");
             sol_log_compute_units();

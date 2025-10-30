@@ -91,6 +91,21 @@ async fn test_sqrt_u128_max() {
 }
 
 #[tokio::test]
+async fn test_muldiv_u64() {
+    let mut pc = ProgramTest::new("spl_math_example", id(), processor!(process_instruction));
+
+    pc.set_compute_max_units(1_000_000);
+
+    let (banks_client, payer, recent_blockhash) = pc.start().await;
+
+    let mut transaction =
+        Transaction::new_with_payer(&[instruction::precise_muldiv(42, 84, 7)], Some(&payer.pubkey()));
+    transaction.sign(&[&payer], recent_blockhash);
+    let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
+    assert_eq!(result.metadata.unwrap().compute_units_consumed, 8282);
+}
+
+#[tokio::test]
 async fn test_u64_multiply() {
     let mut pc = ProgramTest::new("spl_math_example", id(), processor!(process_instruction));
 
