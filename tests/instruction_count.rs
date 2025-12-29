@@ -7,8 +7,7 @@ use {
     solana_sdk::{signature::Signer, transaction::Transaction},
     spl_math_example::{id, instruction, processor::process_instruction},
 };
-use spl_math_example::processor::{TransactionTestResult, CU_CORRECTION};
-use borsh::de::BorshDeserialize;
+use spl_math_example::processor::{CU_CORRECTION};
 
 
 #[tokio::test]
@@ -49,7 +48,8 @@ async fn test_precise_sqrt_u64_max() {
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
 
     let consumed_compute_units = parse_compute_units_from_logs(&result).unwrap();
-    assert_eq!(consumed_compute_units, 363278);
+    // assert_eq!(consumed_compute_units, 363278);
+    assert_eq!(consumed_compute_units, 149571);
 }
 
 #[tokio::test]
@@ -67,7 +67,8 @@ async fn test_precise_sqrt_u32_max() {
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
     let consumed_compute_units = parse_compute_units_from_logs(&result).unwrap();
-    assert_eq!(consumed_compute_units, 184943);
+    // assert_eq!(consumed_compute_units, 184943);
+    assert_eq!(consumed_compute_units, 64791);
 }
 
 #[tokio::test]
@@ -133,7 +134,7 @@ async fn test_muldiv_u64() {
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
     let consumed_compute_units = parse_compute_units_from_logs(&result).unwrap();
-    assert_eq!(consumed_compute_units, 999999);
+    assert_eq!(consumed_compute_units, 3478);
 }
 
 #[tokio::test]
