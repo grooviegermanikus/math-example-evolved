@@ -102,7 +102,7 @@ pub fn process_instruction(
             let result = radicand.sqrt().unwrap().to_imprecise().unwrap() as u64;
             let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
-            msg!("cu_bench_consumed {}", cu_before - cu_after - CU_CORRECTION);
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result);
             Ok(())
         }
@@ -116,7 +116,7 @@ pub fn process_instruction(
             let result = val.mul_div_floor(num, denom).unwrap().to_imprecise().unwrap();
             let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
-            msg!("cu_bench_consumed {}", cu_before - cu_after - CU_CORRECTION);
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result);
             Ok(())
         }
@@ -127,7 +127,7 @@ pub fn process_instruction(
             let result = sqrt(radicand).unwrap();
             let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
-            msg!("cu_bench_consumed {}", cu_before - cu_after - CU_CORRECTION);
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result);
             Ok(())
         }
@@ -138,7 +138,7 @@ pub fn process_instruction(
             let result = sqrt(radicand).unwrap();
             let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
-            msg!("cu_bench_consumed {}", cu_before - cu_after - CU_CORRECTION);
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result);
             Ok(())
         }
@@ -152,7 +152,7 @@ pub fn process_instruction(
             let result = u64_multiply(multiplicand, multiplier);
             let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
-            msg!("cu_bench_consumed {}", cu_before - cu_after - CU_CORRECTION);
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result);
             Ok(())
         }
@@ -163,7 +163,7 @@ pub fn process_instruction(
             let result = u64_divide(dividend, divisor);
             let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
-            msg!("cu_bench_consumed {}", cu_before - cu_after - CU_CORRECTION);
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result);
             Ok(())
         }
@@ -177,7 +177,7 @@ pub fn process_instruction(
             let result = f32_multiply(multiplicand, multiplier);
             let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
-            msg!("cu_bench_consumed {}", cu_before - cu_after - CU_CORRECTION);
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result as u64);
             Ok(())
         }
@@ -188,7 +188,7 @@ pub fn process_instruction(
             let result = f32_divide(dividend, divisor);
             let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
-            msg!("cu_bench_consumed {}", cu_before - cu_after - CU_CORRECTION);
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result as u64);
             Ok(())
         }
@@ -199,7 +199,7 @@ pub fn process_instruction(
             let result = f32_exponentiate(base, exponent);
             let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
-            msg!("cu_bench_consumed {}", cu_before - cu_after - CU_CORRECTION);
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result as u64);
             Ok(())
         }
@@ -210,7 +210,7 @@ pub fn process_instruction(
             let result = f32_natural_log(argument);
             let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
-            msg!("cu_bench_consumed {}", cu_before - cu_after - CU_CORRECTION);
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result as u64);
             Ok(())
         }
@@ -221,7 +221,7 @@ pub fn process_instruction(
             let result = f32_normal_cdf(argument);
             let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
-            msg!("cu_bench_consumed {}", cu_before - cu_after - CU_CORRECTION);
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result as u64);
             Ok(())
         }
@@ -236,7 +236,7 @@ pub fn process_instruction(
             sol_log_compute_units();
             let result = base.powf(exponent);
             sol_log_compute_units();
-            msg!("cu_bench_consumed {}", cu_before - cu_after - CU_CORRECTION);
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result as u64);
             Ok(())
         }
@@ -250,7 +250,7 @@ pub fn process_instruction(
             let result = u128_multiply(multiplicand, multiplier);
             let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
-            msg!("cu_bench_consumed {}", cu_before - cu_after - CU_CORRECTION);
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result);
             Ok(())
         }
@@ -261,7 +261,7 @@ pub fn process_instruction(
             let result = u128_divide(dividend, divisor);
             let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
-            msg!("cu_bench_consumed {}", cu_before - cu_after - CU_CORRECTION);
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result);
             Ok(())
         }
@@ -275,7 +275,7 @@ pub fn process_instruction(
             let result = f64_multiply(multiplicand, multiplier);
             let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
-            msg!("cu_bench_consumed {}", cu_before - cu_after - CU_CORRECTION);
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result as u64);
             Ok(())
         }
@@ -286,7 +286,7 @@ pub fn process_instruction(
             let result = f64_divide(dividend, divisor);
             let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
-            msg!("cu_bench_consumed {}", cu_before - cu_after - CU_CORRECTION);
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result as u64);
             Ok(())
         }
@@ -295,7 +295,7 @@ pub fn process_instruction(
             let cu_before = sol_remaining_compute_units();
             // no-op
             let cu_after = sol_remaining_compute_units();
-            msg!("cu_bench_consumed {}", cu_before - cu_after - CU_CORRECTION);
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", "noop");
             Ok(())
         }

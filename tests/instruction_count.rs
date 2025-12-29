@@ -7,7 +7,7 @@ use {
     solana_sdk::{signature::Signer, transaction::Transaction},
     spl_math_example::{id, instruction, processor::process_instruction},
 };
-use spl_math_example::processor::TransactionTestResult;
+use spl_math_example::processor::{TransactionTestResult, CU_CORRECTION};
 use borsh::de::BorshDeserialize;
 
 
@@ -66,7 +66,13 @@ fn parse_compute_units_from_logs(logs: &Vec<String>) -> Option<u64> {
             let parts: Vec<&str> = log.split("cu_bench_consumed").collect();
             if let Some(units_str) = parts.get(1) {
                 if let Ok(units) = units_str.trim().parse::<u64>() {
-                    return Some(units);
+                    match units.checked_sub(CU_CORRECTION) {
+                        Some(corrected_units) => return Some(corrected_units),
+                        None => {
+                            println!("Compute units underflow after correction");
+                            return Some(0)
+                        },
+                    }
                 }
             }
         }
