@@ -6871,8 +6871,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "spl-math-evolved"
+name = "spl-math"
 version = "0.3.0"
+source = "git+https://github.com/solana-labs/solana-program-library.git?rev=e00b05c#e00b05c1be7759ba070841af3e72e948ec630015"
 dependencies = [
  "num-traits",
  "uint",
@@ -6888,7 +6889,7 @@ dependencies = [
  "solana-program",
  "solana-program-test",
  "solana-sdk",
- "spl-math-evolved",
+ "spl-math",
  "thiserror 2.0.16",
 ]
 

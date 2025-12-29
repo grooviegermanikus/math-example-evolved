@@ -113,11 +113,12 @@ pub fn process_instruction(
             let denom = PreciseNumber::new(denom as u128).unwrap();
             sol_log_compute_units();
             let cu_before = sol_remaining_compute_units();
-            let result = val.mul_div_floor(num, denom).unwrap().to_imprecise().unwrap();
+            // TODO
+            // let result = val.mul_div_floor(num, denom).unwrap().to_imprecise().unwrap();
             let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
             msg!("cu_bench_consumed {}", cu_before - cu_after);
-            msg!("{}", result);
+            // msg!("{}", result);
             Ok(())
         }
         MathInstruction::SquareRootU64 { radicand } => {
