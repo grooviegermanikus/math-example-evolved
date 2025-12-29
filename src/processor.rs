@@ -1,6 +1,7 @@
 #![allow(clippy::arithmetic_side_effects)]
 //! Program state processor
 
+use solana_program::compute_units::sol_remaining_compute_units;
 use {
     crate::{
         approximations::{f32_normal_cdf, sqrt},
@@ -13,6 +14,9 @@ use {
         pubkey::Pubkey,
     },
 };
+
+/// Compensate for compute units used syscall overhead; checked by Noop instruction
+pub const CU_CORRECTION: u64 = 102;
 
 /// u64_multiply
 #[inline(never)]
@@ -86,24 +90,47 @@ pub fn process_instruction(
             msg!("Calculating square root using PreciseNumber");
             let radicand = PreciseNumber::new(radicand as u128).unwrap();
             sol_log_compute_units();
+            let cu_before = sol_remaining_compute_units();
             let result = radicand.sqrt().unwrap().to_imprecise().unwrap() as u64;
+            let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
+            msg!("{}", result);
+            Ok(())
+        }
+        MathInstruction::PreciseMulDiv { val, num, denom } => {
+            msg!("Calculating muldiv using PreciseNumber");
+            let val = PreciseNumber::new(val as u128).unwrap();
+            let num = PreciseNumber::new(num as u128).unwrap();
+            let denom = PreciseNumber::new(denom as u128).unwrap();
+            sol_log_compute_units();
+            let cu_before = sol_remaining_compute_units();
+            let result = val.mul_div_floor(num, denom).unwrap().to_imprecise().unwrap();
+            let cu_after = sol_remaining_compute_units();
+            sol_log_compute_units();
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result);
             Ok(())
         }
         MathInstruction::SquareRootU64 { radicand } => {
             msg!("Calculating u64 square root");
             sol_log_compute_units();
+            let cu_before = sol_remaining_compute_units();
             let result = sqrt(radicand).unwrap();
+            let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result);
             Ok(())
         }
         MathInstruction::SquareRootU128 { radicand } => {
             msg!("Calculating u128 square root");
             sol_log_compute_units();
+            let cu_before = sol_remaining_compute_units();
             let result = sqrt(radicand).unwrap();
+            let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result);
             Ok(())
         }
@@ -113,16 +140,22 @@ pub fn process_instruction(
         } => {
             msg!("Calculating U64 Multiply");
             sol_log_compute_units();
+            let cu_before = sol_remaining_compute_units();
             let result = u64_multiply(multiplicand, multiplier);
+            let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result);
             Ok(())
         }
         MathInstruction::U64Divide { dividend, divisor } => {
             msg!("Calculating U64 Divide");
             sol_log_compute_units();
+            let cu_before = sol_remaining_compute_units();
             let result = u64_divide(dividend, divisor);
+            let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result);
             Ok(())
         }
@@ -132,53 +165,69 @@ pub fn process_instruction(
         } => {
             msg!("Calculating f32 Multiply");
             sol_log_compute_units();
+            let cu_before = sol_remaining_compute_units();
             let result = f32_multiply(multiplicand, multiplier);
+            let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result as u64);
             Ok(())
         }
         MathInstruction::F32Divide { dividend, divisor } => {
             msg!("Calculating f32 Divide");
             sol_log_compute_units();
+            let cu_before = sol_remaining_compute_units();
             let result = f32_divide(dividend, divisor);
+            let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result as u64);
             Ok(())
         }
         MathInstruction::F32Exponentiate { base, exponent } => {
             msg!("Calculating f32 Exponent");
             sol_log_compute_units();
+            let cu_before = sol_remaining_compute_units();
             let result = f32_exponentiate(base, exponent);
+            let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result as u64);
             Ok(())
         }
         MathInstruction::F32NaturalLog { argument } => {
             msg!("Calculating f32 Natural Log");
             sol_log_compute_units();
+            let cu_before = sol_remaining_compute_units();
             let result = f32_natural_log(argument);
+            let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result as u64);
             Ok(())
         }
         MathInstruction::F32NormalCDF { argument } => {
             msg!("Calculating f32 Normal CDF");
             sol_log_compute_units();
+            let cu_before = sol_remaining_compute_units();
             let result = f32_normal_cdf(argument);
+            let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result as u64);
             Ok(())
         }
         MathInstruction::F64Pow { base, exponent } => {
             msg!("Calculating f64 Pow");
             sol_log_compute_units();
-            let result = base.powi(exponent as i32);
+            let cu_before = sol_remaining_compute_units();
+            let result1 = base.powi(exponent as i32);
+            let result2 = base.powf(exponent);
+            let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
-            msg!("{}", result as u64);
-            sol_log_compute_units();
-            let result = base.powf(exponent);
-            sol_log_compute_units();
-            msg!("{}", result as u64);
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
+            msg!("{}", result1 as u64);
+            msg!("{}", result2 as u64);
             Ok(())
         }
         MathInstruction::U128Multiply {
@@ -187,16 +236,22 @@ pub fn process_instruction(
         } => {
             msg!("Calculating u128 Multiply");
             sol_log_compute_units();
+            let cu_before = sol_remaining_compute_units();
             let result = u128_multiply(multiplicand, multiplier);
+            let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result);
             Ok(())
         }
         MathInstruction::U128Divide { dividend, divisor } => {
             msg!("Calculating u128 Divide");
             sol_log_compute_units();
+            let cu_before = sol_remaining_compute_units();
             let result = u128_divide(dividend, divisor);
+            let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result);
             Ok(())
         }
@@ -206,22 +261,32 @@ pub fn process_instruction(
         } => {
             msg!("Calculating f64 Multiply");
             sol_log_compute_units();
+            let cu_before = sol_remaining_compute_units();
             let result = f64_multiply(multiplicand, multiplier);
+            let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result as u64);
             Ok(())
         }
         MathInstruction::F64Divide { dividend, divisor } => {
             msg!("Calculating f64 Divide");
             sol_log_compute_units();
+            let cu_before = sol_remaining_compute_units();
             let result = f64_divide(dividend, divisor);
+            let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
             msg!("{}", result as u64);
             Ok(())
         }
         MathInstruction::Noop => {
-            msg!("Do nothing");
-            msg!("{}", 0_u64);
+            msg!("Perform NOOP");
+            let cu_before = sol_remaining_compute_units();
+            // no-op
+            let cu_after = sol_remaining_compute_units();
+            msg!("cu_bench_consumed {}", cu_before - cu_after);
+            msg!("{}", "noop");
             Ok(())
         }
     }
