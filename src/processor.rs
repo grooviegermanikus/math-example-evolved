@@ -230,15 +230,13 @@ pub fn process_instruction(
             msg!("Calculating f64 Pow");
             sol_log_compute_units();
             let cu_before = sol_remaining_compute_units();
-            let result = base.powi(exponent as i32);
+            let result1 = base.powi(exponent as i32);
+            let result2 = base.powf(exponent);
             let cu_after = sol_remaining_compute_units();
             sol_log_compute_units();
-            msg!("{}", result as u64);
-            sol_log_compute_units();
-            let result = base.powf(exponent);
-            sol_log_compute_units();
             msg!("cu_bench_consumed {}", cu_before - cu_after);
-            msg!("{}", result as u64);
+            msg!("{}", result1 as u64);
+            msg!("{}", result2 as u64);
             Ok(())
         }
         MathInstruction::U128Multiply {
