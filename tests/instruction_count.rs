@@ -7,6 +7,8 @@ use {
     solana_sdk::{signature::Signer, transaction::Transaction},
     spl_math_example::{id, instruction, processor::process_instruction},
 };
+use spl_math_example::processor::TransactionTestResult;
+use borsh::de::BorshDeserialize;
 
 #[tokio::test]
 async fn test_precise_sqrt_u64_max() {
@@ -23,7 +25,30 @@ async fn test_precise_sqrt_u64_max() {
     transaction.sign(&[&payer], recent_blockhash);
 
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
-    assert_eq!(result.metadata.unwrap().compute_units_consumed, 358720);
+
+    let logs = result.metadata.unwrap().log_messages;
+    let consumed_compute_units = parse_compute_units_from_logs(&logs).unwrap();
+    // let result_struct = TransactionTestResult::try_from_slice(&result.metadata.unwrap().return_data.unwrap().data).unwrap();
+
+    assert_eq!(consumed_compute_units, 149570);
+
+    // assert_eq!(result.metadata.unwrap().compute_units_consumed, 358720);
+}
+
+// e.g. Program log: cu_bench_consumed 149570
+fn parse_compute_units_from_logs(logs: &Vec<String>) -> Option<u64> {
+    for log in logs {
+        // only one
+        if log.starts_with("Program log: cu_bench_consumed ") {
+            let parts: Vec<&str> = log.split("cu_bench_consumed").collect();
+            if let Some(units_str) = parts.get(1) {
+                if let Ok(units) = units_str.trim().parse::<u64>() {
+                    return Some(units);
+                }
+            }
+        }
+    }
+    None
 }
 
 #[tokio::test]

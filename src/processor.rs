@@ -1,6 +1,8 @@
 #![allow(clippy::arithmetic_side_effects)]
 //! Program state processor
 
+use borsh::BorshSerialize;
+use solana_program::compute_units::sol_remaining_compute_units;
 use {
     crate::{
         approximations::{f32_normal_cdf, sqrt},
@@ -13,6 +15,13 @@ use {
         pubkey::Pubkey,
     },
 };
+
+/// TransactionTestResult
+#[derive(BorshSerialize, BorshDeserialize, Debug)]
+pub struct TransactionTestResult {
+    /// Compute units consumed during transaction
+    pub compute_units_consumed: u64,
+}
 
 /// u64_multiply
 #[inline(never)]
@@ -85,9 +94,10 @@ pub fn process_instruction(
         MathInstruction::PreciseSquareRoot { radicand } => {
             msg!("Calculating square root using PreciseNumber");
             let radicand = PreciseNumber::new(radicand as u128).unwrap();
-            sol_log_compute_units();
+            let cu_before = sol_remaining_compute_units();
             let result = radicand.sqrt().unwrap().to_imprecise().unwrap() as u64;
-            sol_log_compute_units();
+            let cu_after = sol_remaining_compute_units();
+            msg!("cu_bench_consumed {}", cu_before - cu_after - 102);
             msg!("{}", result);
             Ok(())
         }
