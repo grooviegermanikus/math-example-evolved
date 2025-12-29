@@ -10,6 +10,29 @@ use {
 use spl_math_example::processor::TransactionTestResult;
 use borsh::de::BorshDeserialize;
 
+
+#[tokio::test]
+async fn test_noop() {
+    let mut pc = ProgramTest::new("spl_math_example", id(), processor!(process_instruction));
+
+    pc.set_compute_max_units(1_000_000);
+
+    let (banks_client, payer, recent_blockhash) = pc.start().await;
+
+    let mut transaction = Transaction::new_with_payer(
+        &[instruction::noop()],
+        Some(&payer.pubkey()),
+    );
+    transaction.sign(&[&payer], recent_blockhash);
+
+    let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
+
+    let logs = result.metadata.unwrap().log_messages;
+    let consumed_compute_units = parse_compute_units_from_logs(&logs).unwrap();
+
+    assert_eq!(consumed_compute_units, 0);
+}
+
 #[tokio::test]
 async fn test_precise_sqrt_u64_max() {
     let mut pc = ProgramTest::new("spl_math_example", id(), processor!(process_instruction));
@@ -325,19 +348,4 @@ async fn test_f64_divide() {
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
     assert_eq!(result.metadata.unwrap().compute_units_consumed, 1336);
-}
-
-#[tokio::test]
-async fn test_noop() {
-    let mut pc = ProgramTest::new("spl_math_example", id(), processor!(process_instruction));
-
-    pc.set_compute_max_units(1_000_000);
-
-    let (banks_client, payer, recent_blockhash) = pc.start().await;
-
-    let mut transaction =
-        Transaction::new_with_payer(&[instruction::noop()], Some(&payer.pubkey()));
-    transaction.sign(&[&payer], recent_blockhash);
-    let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
-    assert_eq!(result.metadata.unwrap().compute_units_consumed, 363);
 }
