@@ -49,7 +49,8 @@ async fn test_precise_sqrt_u64_max() {
 
     let consumed_compute_units = parse_compute_units_from_logs(&result).unwrap();
     // assert_eq!(consumed_compute_units, 363278);
-    assert_eq!(consumed_compute_units, 149571);
+    // assert_eq!(consumed_compute_units, 149571);// before improvement 2026-01-04
+    assert_eq!(consumed_compute_units, 136546);
 }
 
 #[tokio::test]
@@ -68,7 +69,8 @@ async fn test_precise_sqrt_u32_max() {
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
     let consumed_compute_units = parse_compute_units_from_logs(&result).unwrap();
     // assert_eq!(consumed_compute_units, 184943);
-    assert_eq!(consumed_compute_units, 64791);
+    // assert_eq!(consumed_compute_units, 64791); // before improvement 2026-01-04
+    assert_eq!(consumed_compute_units, 58025);
 }
 
 #[tokio::test]
@@ -84,7 +86,8 @@ async fn test_sqrt_u64() {
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
     let consumed_compute_units = parse_compute_units_from_logs(&result).unwrap();
-    assert_eq!(consumed_compute_units, 816);
+    // assert_eq!(consumed_compute_units, 816); // before improvement 2026-01-04
+    assert_eq!(consumed_compute_units, 560);
 }
 
 #[tokio::test]
@@ -102,7 +105,8 @@ async fn test_sqrt_u128() {
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
     let consumed_compute_units = parse_compute_units_from_logs(&result).unwrap();
-    assert_eq!(consumed_compute_units, 2905);
+    // assert_eq!(consumed_compute_units, 2905); // before improvement 2026-01-04
+    assert_eq!(consumed_compute_units, 2009);
 }
 
 #[tokio::test]
@@ -118,7 +122,8 @@ async fn test_sqrt_u128_max() {
     transaction.sign(&[&payer], recent_blockhash);
     let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
     let consumed_compute_units = parse_compute_units_from_logs(&result).unwrap();
-    assert_eq!(consumed_compute_units, 5678);
+    // assert_eq!(consumed_compute_units, 5678); // before improvement 2026-01-04
+    assert_eq!(consumed_compute_units, 3885);
 }
 
 #[tokio::test]
