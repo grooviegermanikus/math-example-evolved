@@ -7,6 +7,7 @@ use {
     solana_sdk::{signature::Signer, transaction::Transaction},
     spl_math_example::{id, instruction, processor::process_instruction},
 };
+use spl_math_example::instruction::SqrtAlgorithm;
 use spl_math_example::processor::{CU_CORRECTION};
 
 
@@ -32,7 +33,7 @@ async fn test_noop() {
 }
 
 #[tokio::test]
-async fn test_precise_sqrt_u64_max() {
+async fn test_newton_sqrt_u64_max() {
     let mut pc = ProgramTest::new("spl_math_example", id(), processor!(process_instruction));
 
     pc.set_compute_max_units(1_000_000);
@@ -40,7 +41,7 @@ async fn test_precise_sqrt_u64_max() {
     let (banks_client, payer, recent_blockhash) = pc.start().await;
 
     let mut transaction = Transaction::new_with_payer(
-        &[instruction::precise_sqrt(u64::MAX)],
+        &[instruction::sqrt(u64::MAX, SqrtAlgorithm::Newton)],
         Some(&payer.pubkey()),
     );
     transaction.sign(&[&payer], recent_blockhash);
@@ -54,7 +55,7 @@ async fn test_precise_sqrt_u64_max() {
 }
 
 #[tokio::test]
-async fn test_precise_sqrt_u32_max() {
+async fn test_cordic_sqrt_u32_max() {
     let mut pc = ProgramTest::new("spl_math_example", id(), processor!(process_instruction));
 
     pc.set_compute_max_units(1_000_000);
@@ -62,7 +63,7 @@ async fn test_precise_sqrt_u32_max() {
     let (banks_client, payer, recent_blockhash) = pc.start().await;
 
     let mut transaction = Transaction::new_with_payer(
-        &[instruction::precise_sqrt(u32::MAX as u64)],
+    &[instruction::sqrt(u32::MAX as u64, SqrtAlgorithm::Cordic)],
         Some(&payer.pubkey()),
     );
     transaction.sign(&[&payer], recent_blockhash);
@@ -74,7 +75,7 @@ async fn test_precise_sqrt_u32_max() {
 }
 
 #[tokio::test]
-async fn test_sqrt_u64() {
+async fn test_cordic_sqrt_u64() {
     let mut pc = ProgramTest::new("spl_math_example", id(), processor!(process_instruction));
 
     pc.set_compute_max_units(1_000_000);

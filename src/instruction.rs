@@ -6,6 +6,15 @@ use {
     solana_program::instruction::Instruction,
 };
 
+/// Algorithms supported for square root calculation
+#[derive(Clone, Debug, BorshSerialize, BorshDeserialize, PartialEq)]
+pub enum SqrtAlgorithm {
+    /// Babylonian method
+    Newton,
+    /// CORDIC method
+    Cordic,
+}
+
 /// Instructions supported by the math program, used for testing instruction
 /// counts
 #[derive(Clone, Debug, BorshSerialize, BorshDeserialize, PartialEq)]
@@ -13,10 +22,12 @@ pub enum MathInstruction {
     /// Calculate the square root of the given u64 with decimals
     ///
     /// No accounts required for this instruction
-    PreciseSquareRoot {
+    SquareRoot {
         /// Number underneath the square root sign, whose square root will be
         /// calculated
         radicand: u64,
+        /// Algorithm to use for square root calculation
+        algorithm: SqrtAlgorithm,
     },
     /// Muldiv three u64 values
     ///
@@ -161,12 +172,12 @@ pub enum MathInstruction {
     Noop,
 }
 
-/// Create PreciseSquareRoot instruction
-pub fn precise_sqrt(radicand: u64) -> Instruction {
+/// Create SquareRoot instruction
+pub fn sqrt(radicand: u64, sqrt_algorithm: SqrtAlgorithm) -> Instruction {
     Instruction {
         program_id: id(),
         accounts: vec![],
-        data: borsh::to_vec(&MathInstruction::PreciseSquareRoot { radicand }).unwrap(),
+        data: borsh::to_vec(&MathInstruction::SquareRoot { radicand, algorithm: sqrt_algorithm }).unwrap(),
     }
 }
 

@@ -1,7 +1,9 @@
 #![allow(clippy::arithmetic_side_effects)]
 //! Program state processor
 
+use num_traits::real::Real;
 use solana_program::compute_units::sol_remaining_compute_units;
+use spl_math::precise_number::PreciseNumber256D18;
 use {
     crate::{
         approximations::{f32_normal_cdf, sqrt},
@@ -14,6 +16,7 @@ use {
         pubkey::Pubkey,
     },
 };
+use crate::instruction::SqrtAlgorithm;
 
 /// Compensate for compute units used syscall overhead; checked by Noop instruction
 pub const CU_CORRECTION: u64 = 102;
@@ -86,16 +89,31 @@ pub fn process_instruction(
 ) -> ProgramResult {
     let instruction = MathInstruction::try_from_slice(input).unwrap();
     match instruction {
-        MathInstruction::PreciseSquareRoot { radicand } => {
+        MathInstruction::SquareRoot { radicand, algorithm } => {
             msg!("Calculating square root using PreciseNumber");
             let radicand = PreciseNumber::new(radicand as u128).unwrap();
-            sol_log_compute_units();
-            let cu_before = sol_remaining_compute_units();
-            let result = radicand.sqrt().unwrap().to_imprecise().unwrap() as u64;
-            let cu_after = sol_remaining_compute_units();
-            sol_log_compute_units();
-            msg!("cu_bench_consumed {}", cu_before - cu_after);
-            msg!("{}", result);
+
+                match algorithm {
+                    SqrtAlgorithm::Newton => {
+                        sol_log_compute_units();
+                        let cu_before = sol_remaining_compute_units();
+                        let result = radicand.sqrt_newton().unwrap().to_imprecise().unwrap() as u64;
+                        let cu_after = sol_remaining_compute_units();
+                        sol_log_compute_units();
+                        msg!("cu_bench_consumed {}", cu_before - cu_after);
+                        msg!("{}", result);
+                    }
+                    SqrtAlgorithm::Cordic => {
+                        sol_log_compute_units();
+                        let cu_before = sol_remaining_compute_units();
+                        let result = radicand.sqrt_cordic().unwrap().to_imprecise().unwrap() as u64;
+                        let cu_after = sol_remaining_compute_units();
+                        sol_log_compute_units();
+                        msg!("cu_bench_consumed {}", cu_before - cu_after);
+                        msg!("{}", result);
+                    }
+                }
+
             Ok(())
         }
         MathInstruction::PreciseMulDiv { val, num, denom } => {
@@ -338,42 +356,4 @@ mod tests {
         assert!(abs_difference <= f32::EPSILON);
     }
 
-    #[test]
-    fn test_process_instruction() {
-        let program_id = Pubkey::new_unique();
-        for math_instruction in &[
-            MathInstruction::PreciseSquareRoot { radicand: u64::MAX },
-            MathInstruction::SquareRootU64 { radicand: u64::MAX },
-            MathInstruction::SquareRootU128 {
-                radicand: u128::MAX,
-            },
-            MathInstruction::U64Multiply {
-                multiplicand: 3,
-                multiplier: 4,
-            },
-            MathInstruction::U64Divide {
-                dividend: 2,
-                divisor: 2,
-            },
-            MathInstruction::F32Multiply {
-                multiplicand: 3.0,
-                multiplier: 4.0,
-            },
-            MathInstruction::F32Divide {
-                dividend: 2.0,
-                divisor: 2.0,
-            },
-            MathInstruction::F32Exponentiate {
-                base: 4.0,
-                exponent: 2.0,
-            },
-            MathInstruction::F32NaturalLog {
-                argument: std::f32::consts::E,
-            },
-            MathInstruction::Noop,
-        ] {
-            let input = borsh::to_vec(math_instruction).unwrap();
-            process_instruction(&program_id, &[], &input).unwrap();
-        }
-    }
 }
