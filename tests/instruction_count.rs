@@ -41,7 +41,7 @@ async fn test_newton_sqrt_u64_max() {
     let (banks_client, payer, recent_blockhash) = pc.start().await;
 
     let mut transaction = Transaction::new_with_payer(
-        &[instruction::sqrt(u64::MAX, SqrtAlgorithm::Newton)],
+        &[instruction::precise_sqrt(u64::MAX, SqrtAlgorithm::Newton)],
         Some(&payer.pubkey()),
     );
     transaction.sign(&[&payer], recent_blockhash);
@@ -63,7 +63,7 @@ async fn test_cordic_sqrt_u32_max() {
     let (banks_client, payer, recent_blockhash) = pc.start().await;
 
     let mut transaction = Transaction::new_with_payer(
-    &[instruction::sqrt(u32::MAX as u64, SqrtAlgorithm::Cordic)],
+        &[instruction::precise_sqrt(u32::MAX as u64, SqrtAlgorithm::Cordic)],
         Some(&payer.pubkey()),
     );
     transaction.sign(&[&payer], recent_blockhash);
@@ -89,6 +89,44 @@ async fn test_cordic_sqrt_u64() {
     let consumed_compute_units = parse_compute_units_from_logs(&result).unwrap();
     // assert_eq!(consumed_compute_units, 816); // before improvement 2026-01-04
     assert_eq!(consumed_compute_units, 560);
+}
+
+
+
+#[tokio::test]
+async fn test_newton_sqrt_array() {
+    let mut pc = ProgramTest::new("spl_math_example", id(), processor!(process_instruction));
+
+    pc.set_compute_max_units(5_000_000);
+
+    let (banks_client, payer, recent_blockhash) = pc.start().await;
+
+    let mut transaction = Transaction::new_with_payer(
+        &[instruction::precise_sqrt_array(1000.0, 100.0, SqrtAlgorithm::Newton)],
+        Some(&payer.pubkey()),
+    );
+    transaction.sign(&[&payer], recent_blockhash);
+    let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
+    let consumed_compute_units = parse_compute_units_from_logs(&result).unwrap();
+    assert_eq!(consumed_compute_units, 212984);
+}
+
+#[tokio::test]
+async fn test_cordic_sqrt_array() {
+    let mut pc = ProgramTest::new("spl_math_example", id(), processor!(process_instruction));
+
+    pc.set_compute_max_units(5_000_000);
+
+    let (banks_client, payer, recent_blockhash) = pc.start().await;
+
+    let mut transaction = Transaction::new_with_payer(
+        &[instruction::precise_sqrt_array(1000.0, 100.0, SqrtAlgorithm::Cordic)],
+        Some(&payer.pubkey()),
+    );
+    transaction.sign(&[&payer], recent_blockhash);
+    let result = banks_client.process_transaction_with_metadata(transaction).await.unwrap();
+    let consumed_compute_units = parse_compute_units_from_logs(&result).unwrap();
+    assert_eq!(consumed_compute_units, 607984);
 }
 
 #[tokio::test]

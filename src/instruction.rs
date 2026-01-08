@@ -22,10 +22,10 @@ pub enum MathInstruction {
     /// Calculate the square root of the given u64 with decimals
     ///
     /// No accounts required for this instruction
-    SquareRoot {
+    PreciseSquareRoot {
         /// Number underneath the square root sign, whose square root will be
         /// calculated
-        radicand: u64,
+        radicand: Vec<f64>,
         /// Algorithm to use for square root calculation
         algorithm: SqrtAlgorithm,
     },
@@ -173,11 +173,26 @@ pub enum MathInstruction {
 }
 
 /// Create SquareRoot instruction
-pub fn sqrt(radicand: u64, sqrt_algorithm: SqrtAlgorithm) -> Instruction {
+pub fn precise_sqrt(radicand: u64, sqrt_algorithm: SqrtAlgorithm) -> Instruction {
     Instruction {
         program_id: id(),
         accounts: vec![],
-        data: borsh::to_vec(&MathInstruction::SquareRoot { radicand, algorithm: sqrt_algorithm }).unwrap(),
+        data: borsh::to_vec(&MathInstruction::PreciseSquareRoot { radicand: vec![radicand as f64], algorithm: sqrt_algorithm }).unwrap(),
+    }
+}
+
+/// Create SquareRoot instruction for array of f64
+pub fn precise_sqrt_array(start: f64, step: f64, sqrt_algorithm: SqrtAlgorithm) -> Instruction {
+
+    let mut radicand: Vec<f64> = Vec::new();
+    for i in 0..8 {
+        radicand.push(start + step * (i as f64));
+    }
+
+    Instruction {
+        program_id: id(),
+        accounts: vec![],
+        data: borsh::to_vec(&MathInstruction::PreciseSquareRoot { radicand, algorithm: sqrt_algorithm }).unwrap(),
     }
 }
 

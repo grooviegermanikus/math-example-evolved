@@ -1,7 +1,7 @@
 #![allow(clippy::arithmetic_side_effects)]
 //! Program state processor
 
-use num_traits::real::Real;
+use crate::instruction::SqrtAlgorithm;
 use solana_program::compute_units::sol_remaining_compute_units;
 use spl_math::precise_number::PreciseNumber256D18;
 use {
@@ -16,7 +16,6 @@ use {
         pubkey::Pubkey,
     },
 };
-use crate::instruction::SqrtAlgorithm;
 
 /// Compensate for compute units used syscall overhead; checked by Noop instruction
 pub const CU_CORRECTION: u64 = 102;
@@ -89,28 +88,38 @@ pub fn process_instruction(
 ) -> ProgramResult {
     let instruction = MathInstruction::try_from_slice(input).unwrap();
     match instruction {
-        MathInstruction::SquareRoot { radicand, algorithm } => {
+        MathInstruction::PreciseSquareRoot { radicand: radicands, algorithm } => {
             msg!("Calculating square root using PreciseNumber");
-            let radicand = PreciseNumber::new(radicand as u128).unwrap();
+            let radicands: Vec<PreciseNumber256D18> = radicands.iter().map(|x| PreciseNumber256D18::new_from_f64(*x).unwrap()).collect();
 
                 match algorithm {
                     SqrtAlgorithm::Newton => {
                         sol_log_compute_units();
                         let cu_before = sol_remaining_compute_units();
-                        let result = radicand.sqrt_newton().unwrap().to_imprecise().unwrap() as u64;
+                        // collect sum to avoid optimizer removing the loop
+                        let mut sum_result: i128 = 0;
+                        for radicand in radicands {
+                            let result = radicand.sqrt_newton().unwrap();
+                            sum_result += result.value.0[0] as i128;
+                        }
                         let cu_after = sol_remaining_compute_units();
                         sol_log_compute_units();
                         msg!("cu_bench_consumed {}", cu_before - cu_after);
-                        msg!("{}", result);
+                        msg!("{}", sum_result);
                     }
                     SqrtAlgorithm::Cordic => {
                         sol_log_compute_units();
                         let cu_before = sol_remaining_compute_units();
-                        let result = radicand.sqrt_cordic().unwrap().to_imprecise().unwrap() as u64;
+                        // collect sum to avoid optimizer removing the loop
+                        let mut sum_result: i128 = 0;
+                        for radicand in radicands {
+                            let result = radicand.sqrt_cordic().unwrap();
+                            sum_result += result.value.0[0] as i128;
+                        }
                         let cu_after = sol_remaining_compute_units();
                         sol_log_compute_units();
                         msg!("cu_bench_consumed {}", cu_before - cu_after);
-                        msg!("{}", result);
+                        msg!("{}", sum_result);
                     }
                 }
 
@@ -312,7 +321,7 @@ pub fn process_instruction(
 
 #[cfg(test)]
 mod tests {
-    use {super::*, crate::instruction::MathInstruction};
+    use super::*;
 
     #[test]
     fn test_u64_multiply() {
